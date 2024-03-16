@@ -1,0 +1,26 @@
+-------------------------------------------------------------------------------
+        PADURARIU TEOFIL - 324CC - TEMA 1 SO - LOADER DE EXECUTABILE
+-------------------------------------------------------------------------------
+
+    Tema presupune implementarea unui loader de executabile sub forma unei
+biblioteci partajate.
+
+    Rulând comanda LD_LIBRARY_PATH=. ./so_exec <executabil>, mai întâi loaderul
+va inițializa handlerul pentru semnale de tip SIGSEGV apeland funcția sigaction.
+Mai apoi se va deshide fișierul executabil necesar mapărilor și funcția
+so_parse_exec va parsa același executabil, stocand informațiile despre
+segmentele programului in structura exec din fișierul loader.c. După acești
+pași, execuția programului începe. La fiecare semnal SIGSEGV primit, handlerul
+se va declanșa și va căuta segmentul din care face parte adresa care a generat
+respectivul semnal. În cazul în care adresa nu se găsește în niciun segment,
+adresa nu face parte din spațiul de adrese al procesului, deci se încearcă un
+acces invalid la memorie. Prin urmare se va declanșa handlerul default. În cazul
+în care adresa face parte din spațiul de adrese al procesului, se află pagina
+din care face parte aceasta, and-uind valoarea acesteia cu 0xfffff000. Se verifică
+dacă pagina a fost deja mapată. Daca a fost mapată, înseamna că se încearcă un
+acces nepermis la memorie (segmentul respectiv nu are permisiunile necesare). Se
+va rula handlerul default, ca în cazul de mai devreme. Dacă pagina nu a fost
+mapată, se va încărca în memorie. Folosind funcția mmap, fiecare pagina a fost
+mapată la o anumită zonă din fișierul executabil sau a fost mapata anonim.
+În comentariile codului din loader.c am explicat detaliat cum funcționează partea
+de încărcare a unei pagini.
